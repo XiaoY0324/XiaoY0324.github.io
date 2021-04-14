@@ -1,0 +1,1191 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="1. 数组、链表与跳表, 杨帅 amosyang shuaiYang 前端">
+    <meta name="baidu-site-verification" content>
+    <meta name="google-site-verification" content>
+    <meta name="description" content="数组、链表与跳表Array ((数组))
+数组的话大家应用的应该非常多了, 列举出来他们的常见写法如下
+
+  Java, C++: int a[100]; // 100 表示数组大小
+  Python: list = [];
+  Javas">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>1. 数组、链表与跳表 | 杨帅的博客</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    <style type="text/css">
+        
+    </style>
+
+    <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
+    <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?46e79e71af0709a5b9106bf20cecc493";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body>
+
+<header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="../../../../index.html" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">杨帅的博客</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fa fa-navicon"></i></a>
+<ul class="right">
+    
+    <li class="hide-on-med-and-down">
+        <a href="/" class="waves-effect waves-light">
+            
+            <span>首页</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/tags" class="waves-effect waves-light">
+            
+            <span>标签</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/categories" class="waves-effect waves-light">
+            
+            <span>分类</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/archives" class="waves-effect waves-light">
+            
+            <span>归档</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/about" class="waves-effect waves-light">
+            
+            <span>关于</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/friends" class="waves-effect waves-light">
+            
+            <span>友情链接</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/contact" class="waves-effect waves-light">
+            
+            <span>联系我</span>
+        </a>
+    </li>
+    
+    <li>
+        <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+            <i id="searchIcon" class="fa fa-search" title="搜索"></i>
+        </a>
+    </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">杨帅的博客</div>
+        <div class="logo-desc">
+            
+            计算机科学与技术
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li>
+            <a href="/" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                首页
+            </a>
+        </li>
+        
+        <li>
+            <a href="/tags" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                标签
+            </a>
+        </li>
+        
+        <li>
+            <a href="/categories" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                分类
+            </a>
+        </li>
+        
+        <li>
+            <a href="/archives" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                归档
+            </a>
+        </li>
+        
+        <li>
+            <a href="/about" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                关于
+            </a>
+        </li>
+        
+        <li>
+            <a href="/friends" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                友情链接
+            </a>
+        </li>
+        
+        <li>
+            <a href="/contact" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                联系我
+            </a>
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/XiaoY0324" class="waves-effect waves-light" target="_blank">
+                <i class="fa fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/XiaoY0324" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '../../../../index.html';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/15.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        1. 数组、链表与跳表
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 20px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                        <a href="../../../../tags/数据结构/" target="_blank">
+                            <span class="chip bg-color">数据结构</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                        <a href="../../../../categories/数据结构/" class="post-category" target="_blank">
+                            数据结构
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                <div class="post-date info-break-policy">
+                    <i class="fa fa-calendar-minus-o fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2020-10-04
+                </div>
+
+                <div class="post-author info-break-policy">
+                    <i class="fa fa-user-o fa-fw"></i>作者:&nbsp;&nbsp;
+                    
+                    杨帅
+                    
+                </div>
+
+                
+                
+                <div class="info-break-policy">
+                    <i class="fa fa-file-word-o fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    6.2k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="fa fa-clock-o fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    22 分
+                </div>
+                
+                
+
+                
+                <div id="busuanzi_container_page_pv" class="info-break-policy">
+                    <i class="fa fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                    <span id="busuanzi_value_page_pv"></span>
+                </div>
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="数组、链表与跳表"><a href="#数组、链表与跳表" class="headerlink" title="数组、链表与跳表"></a>数组、链表与跳表</h1><h2 id="Array-数组"><a href="#Array-数组" class="headerlink" title="Array ((数组))"></a>Array ((数组))</h2><blockquote>
+<p>数组的话大家应用的应该非常多了, 列举出来他们的常见写法如下</p>
+</blockquote>
+<pre><code>  Java, C++: int a[100]; // 100 表示数组大小
+  Python: list = [];
+  Javascript: let list = [1, 2, 3]</code></pre><blockquote>
+<p>数组底层的硬件实现的话，有一个叫做内存管理器的东西，每当你申请一个数组，计算机实际上是在内存中给你开辟了一段连续的地址。每一个地址((该数组上每一个元素所在的地址))都可以通过内存管理器进行访问，下图就为数组相应的内存地址，所以访问第一个元素和访问任意一个元素的时间复杂度是一样的, 也就是常数级的访问，为 O((1))<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjja0kfjfqj31ji0u0b29.jpg" alt></p>
+</blockquote>
+<h3 id="插入元素"><a href="#插入元素" class="headerlink" title="插入元素"></a>插入元素</h3><p><font style="font-weight: 900;"> 时间复杂度为 O((n))</font></p>
+<blockquote>
+<p>如下图, 比如把D插入到3号位置, 那么 E F G都要往下移位置, 在最坏的情况下，整个数组的元素都要挪动，在好的情况下((插入到数组尾部)), 也需要挪动一个数组，平均下来每次都要挪动一半数组, 所以数组插入操作的时间复杂度为 O((n))</p>
+</blockquote>
+<div style="display: flex; justify-content: space-around;">
+  <img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjja3heqdqj310x0u00yi.jpg" width="300" height="300" style="height: 300px !important;">
+  <img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjja62n56rj31580u0af4.jpg" width="300" height="300" style="height: 300px !important;">
+</div>
+
+<h3 id="删除元素"><a href="#删除元素" class="headerlink" title="删除元素"></a>删除元素</h3><p><font style="font-weight: 900;"> 时间复杂度为 O((n))</font></p>
+<blockquote>
+<p>比如删除 Z 元素后, 要把 D E F元素往上移动, 然后把最后一个元素设置为空，唤起垃圾回收机制即可，如果你必须手动管理内存的话，就把这一个数组的size减少即可。</p>
+</blockquote>
+<div style="display: flex; justify-content: space-around;">
+  <img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjalti2wpj316b0u0dia.jpg" width="300" height="300" style="height: 300px !important;">
+  <img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjammmu67j315k0u043b.jpg" width="300" height="300" style="height: 300px !important;">
+</div>
+
+<h3 id="修改元素"><a href="#修改元素" class="headerlink" title="修改元素"></a>修改元素</h3><p><font style="font-weight: 900;"> 如果根据下标修改就是O((1))，如果通过查找就是O((n))</font> </p>
+<h3 id="查找元素"><a href="#查找元素" class="headerlink" title="查找元素"></a>查找元素</h3><p><font style="font-weight: 900;"> 时间复杂度为 O((1))</font><br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjea9om9jj31q60tsady.jpg" alt></p>
+<h2 id="Linked-List-链表"><a href="#Linked-List-链表" class="headerlink" title="Linked List((链表))"></a>Linked List((链表))</h2><blockquote>
+<p>链表这个数据结构就是为了弥补我们前面提到的数组某些操作时间复杂度过高的缺陷, 链表每个节点是什么呢? 一般我们定义个 class Node {  },  里面至少包含2个成员变量value和next，每个节点就是该类的实例化对象啦，next指向下一个元素，串在一起就构成了类似于数组的一个结构。如果只有一个next指针的话，我们叫做<font style="font-weight: 900;">单链表</font>，如果还有个先前指针((prev或者previous))的话，就叫做<font style="font-weight: 900;">双向链表</font>，整个链表的头结点为head, 尾节点为tail, tail节点的指针的next一般指向none，但是如果tail节点的next指回head节点，那么这就叫做<font style="font-weight: 900;">循环链表</font>，类似于一条头尾连接的蜈蚣或环状蛇。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjat9xqudj32550u0n60.jpg" alt></p>
+</blockquote>
+<h3 id="增加节点"><a href="#增加节点" class="headerlink" title="增加节点"></a>增加节点</h3><p><font style="font-weight: 900;"> 时间复杂度为 O((1))</font></p>
+<blockquote>
+<p>插入元素的操作简化为只需要把前面节点的next指向新节点，新节点的next元素指向之前的下一个节点即可，这样的话总共操作两次，是常数次的，所以时间复杂度是 O((1))<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjdoeezotj326s0petjn.jpg" alt></p>
+</blockquote>
+<h3 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h3><p><font style="font-weight: 900;"> 时间复杂度为 O((1)), 同增加节点</font></p>
+<h3 id="修改元素-1"><a href="#修改元素-1" class="headerlink" title="修改元素"></a>修改元素</h3><p><font style="font-weight: 900;"> 如果根据下标修改就是O((1))，如果通过查找就是O((n))</font> </p>
+<h3 id="查找节点"><a href="#查找节点" class="headerlink" title="查找节点"></a>查找节点</h3><p><font style="font-weight: 900;"> 时间复杂度为 O((n))</font></p>
+<blockquote>
+<p>这里我们看到，增加/删除节点时，没有引起整个链表的群移操作，正是因为这样，所以它的增加和删除节点操作的效率非常高，为O((1)), 但是也是因为这样一个结构，导致了你要访问链表中任何一个位置, 它的操作就不再是简单的了，举个例子，要访问头节点和尾结点是很容易的，也就是 O((1)) 即可，但是其他位置必须从头节点一步一步往后挪去访问，时间复杂度是 O((n)), 可以看出，并没有很完美的数据结构, 如果有的话, 也不需要 Array 和 Linked list 并存了。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjje5pmsecj311g0u00zd.jpg" width="300" height="300"></p>
+</blockquote>
+<h3 id="工程中的应用"><a href="#工程中的应用" class="headerlink" title="工程中的应用"></a>工程中的应用</h3><p>LRU Cache 缓存算法</p>
+<h2 id="Skip-list-跳表"><a href="#Skip-list-跳表" class="headerlink" title="Skip list((跳表))"></a>Skip list((跳表))</h2><blockquote>
+<p>链表除了查找元素时间复杂度为O((n))之外，其他都趋近完美，但是如果链表元素本身有序排列的时候这时如果我们要快速查询，比如5在什么地方或者5存不存在，如果是普通的数组可以用二分查找，但是在链表里面怎么办? 怎么有效地加速呢？于是在1990年前后，一种新的数据结构出现了它的名字叫做跳表。如下图：平衡树和二分查找都是19世纪60年代诞生的, 跳表的出现是用来取代平衡树和二分查找的。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjezlga7ej31rc0u0e81.jpg" alt></p>
+</blockquote>
+<p>思考一下：如何给有序的链表查询操作加速呢<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjgt70gswj30vq07gdg4.jpg" alt></p>
+<p>现在我们有个场景，想快速找到上图链表中的 10 这个元素，只能从头开始遍历链表，直到找到我们需要找的元素。查找路径：1、3、4、5、7、8、9、10。这样的查找效率很低，平均时间复杂度很高O((n))。那有没有办法提高链表的查找速度呢？如下图所示，我们从链表中每两个元素抽出来，加一级索引，一级索引指向了原始链表，即：通过一级索引 7 的down指针可以找到原始链表的 7 。那现在怎么查找 10 这个元素呢？</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjgt8rc4sj30vq0diq3q.jpg" alt><br>先在索引找 1、4、7、9，遍历到一级索引的 9 时，发现 9 的后继节点是 13，比 10 大，于是不往后找了，而是通过 9 找到原始链表的 9，然后再往后遍历找到了我们要找的 10，遍历结束。有没有发现，加了一级索引后，查找路径：1、4、7、9、10，查找节点需要遍历的元素相对少了，我们不需要对 10 之前的所有数据都遍历，查找的效率提升了。</p>
+<p>那如果加二级索引呢？如下图所示，查找路径：1、7、9、10。是不是找 10 的效率更高了？这就是跳表的思想，用“空间换时间”，通过给链表建立索引，提高了查找的效率。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjgt9qwyhj30vq0if0tt.jpg" alt><br>可能同学们会想，从上面案例来看，提升的效率并不明显，本来需要遍历8个元素，优化了半天，还需要遍历 4 个元素，其实是因为我们的数据量太少了，当数据量足够大时，效率提升会很大。如下图所示，假如有序单链表现在有1万个元素，分别是 0~9999。现在我们建了很多级索引，最高级的索引，就两个元素 0、5000，次高级索引四个元素 0、2500、5000、7500，依次类推，当我们查找 7890 这个元素时，查找路径为 0、5000、7500 … 7890，通过最高级索引直接跳过了5000个元素，次高层索引直接跳过了2500个元素，从而使得<font style="font-weight: 900;">链表能够实现二分查找</font>。由此可以看出，当元素数量较多时，索引提高的效率比较大，近似于二分查找。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjgwjmj8hj30yg0anjth.jpg" alt><br>到这里大家应该已经明白了什么是跳表。跳表是可以实现二分查找的有序链表。</p>
+<h3 id="查找元素-1"><a href="#查找元素-1" class="headerlink" title="查找元素"></a>查找元素</h3><p><font style="font-weight: 900;"> 时间复杂度O((logn))</font><br>既然跳表可以提升链表查找元素的效率，那查找一个元素的时间复杂度到底是多少呢？查找元素的过程是从最高级索引开始，一层一层遍历最后下沉到原始链表。所以，时间复杂度 = 索引的高度 * 每层索引遍历元素的个数。</p>
+<p>先来求跳表的索引高度。如下图所示，假设每两个结点会抽出一个结点作为上一级索引的结点，原始的链表有n个元素，则一级索引有n/2 个元素、二级索引有 n/4 个元素、k级索引就有 n/$2^{k}$个元素。最高级索引一般有2个元素，即：最高级索引 h 满足 2 = n/$2^{h}$，即 h = $ log_2n $ - 1，最高级索引 h 为索引层的高度加上原始数据一层，跳表的总高度 h = $ log_2n $。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjh1xw6vpj30vq0c7752.jpg" alt></p>
+<p>我们看上图中加粗的箭头，表示查找元素 x 的路径，那查找过程中每一层索引最多遍历几个元素呢？</p>
+<p>图中所示，现在到达第 k 级索引，我们发现要查找的元素 x 比 y 大比 z 小，所以，我们需要从 y 处下降到 k-1 级索引继续查找，k-1级索引中比 y 大比 z 小的只有一个 w，所以在 k-1 级索引中，我们遍历的元素最多就是 y、w、z，发现 x 比 w大比 z 小之后，再下降到 k-2 级索引。所以，k-2 级索引最多遍历的元素为 w、u、z。其实每级索引都是类似的道理，每级索引中都是两个结点抽出一个结点作为上一级索引的结点。 现在我们得出结论：当每级索引都是两个结点抽出一个结点作为上一级索引的结点时，每一层最多遍历3个结点。</p>
+<p>跳表的索引高度 h = $ log_2n $，且每层索引最多遍历 3 个元素。所以跳表中查找一个元素的时间复杂度为 O(( 3*logn ))，省略常数即：O((logn))。</p>
+<p><font style="font-weight: 900;"> 空间复杂度O((n))</font><br>跳表通过建立索引，来提高查找元素的效率，就是典型的“空间换时间”的思想，所以在空间上做了一些牺牲，那空间复杂度到底是多少呢？</p>
+<p>假如原始链表包含 n 个元素，则一级索引元素个数为 n/2、二级索引元素个数为 n/4、三级索引元素个数为 n/8 以此类推。所以，索引节点的总和是：n/2 + n/4 + n/8 + …  + 8 + 4 + 2 = n-2，空间复杂度是 O((n))。</p>
+<p>如下图所示：如果每三个结点抽一个结点做为索引，索引总和数就是 n/3 + n/9 + n/27 + … + 9 + 3 + 1 = n/2，减少了一半。所以我们可以通过较少索引数来减少空间复杂度，但是相应的肯定会造成查找效率有一定下降，我们可以根据我们的应用场景来控制这个阈值，看我们更注重时间还是空间。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjh33sljzj30vq0aiaae.jpg" alt><br>But，索引结点往往只需要存储 key 和几个指针，并不需要存储完整的对象，所以当对象比索引结点大很多时，索引占用的额外空间就可以忽略了。举个例子：我们现在需要用跳表来给所有学生建索引，学生有很多属性：学号、姓名、性别、身份证号、年龄、家庭住址、身高、体重等。学生的各种属性只需要在原始链表中存储一份即可，我们只需要用学生的学号（int 类型的数据）建立索引，所以索引相对原始数据而言，占用的空间可以忽略。</p>
+<h3 id="插入数据"><a href="#插入数据" class="headerlink" title="插入数据"></a>插入数据</h3><p><font style="font-weight: 900;"> 时间复杂度O((logn))</font><br>插入数据看起来也很简单，跳表的原始链表需要保持有序，所以我们会向查找元素一样，找到元素应该插入的位置。如下图所示，要插入数据6，整个过程类似于查找6，整个的查找路径为 1、1、1、4、4、5。查找到第底层原始链表的元素 5 时，发现 5 小于 6 但是后继节点 7 大于 6，所以应该把 6 插入到 5 之后 7 之前。整个时间复杂度为查找元素的时间复杂度 O((logn))。</p>
+<p><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjjh95sje6j30vq0nggmz.jpg" alt></p>
+<h3 id="动态维护索引"><a href="#动态维护索引" class="headerlink" title="动态维护索引"></a>动态维护索引</h3><p>如下图所示，假如一直往原始列表中添加数据，但是不更新索引，就可能出现两个索引节点之间数据非常多的情况，极端情况，跳表退化为单链表，从而使得查找效率从 O(logn) 退化为 O(n)。那这种问题该怎么解决呢？我们需要在插入数据的时候，索引节点也需要相应的增加、或者重建索引，来避免查找效率的退化。那我们该如何去维护这个索引呢？<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjkmctnh36j30vq0dpjrv.jpg" alt></p>
+<p>比较容易理解的做法就是完全重建索引，我们每次插入数据后，都把这个跳表的索引删掉全部重建，重建索引的时间复杂度是多少呢？因为索引的空间复杂度是 O((n))，即：索引节点的个数是 O((n)) 级别，每次完全重新建一个 O((n)) 级别的索引，时间复杂度也是 O((n)) 。造成的后果是：为了维护索引，导致每次插入数据的时间复杂度变成了 O((n))。</p>
+<p>那有没有其他效率比较高的方式来维护索引呢？假如跳表每一层的晋升概率是 1/2，最理想的索引就是在原始链表中每隔一个元素抽取一个元素做为一级索引。换种说法，<font style="font-weight: 900;">我们在原始链表中随机的选 n/2 个元素做为一级索引是不是也能通过索引提高查找的效率呢？</font> 当然可以了，因为一般随机选的元素相对来说都是比较均匀的。如下图所示，随机选择了n/2 个元素做为一级索引，虽然不是每隔一个元素抽取一个，但是对于查找效率来讲，影响不大，比如我们想找元素 16，仍然可以通过一级索引，使得遍历路径较少了将近一半。如果抽取的一级索引的元素恰好是前一半的元素 1、3、4、5、7、8，那么查找效率确实没有提升，但是这样的概率太小了。我们可以认为：当原始链表中<font style="font-weight: 900;">元素数量足够大，且抽取足够随机</font>的话，我们得到的索引是均匀的。我们要清楚设计良好的数据结构都是为了应对大数据量的场景，如果原始链表只有 5 个元素，那么依次遍历 5 个元素也没有关系，因为数据量太少了。所以，我们可以维护一个这样的索引：<font style="font-weight: 900;">随机选 n/2 个元素做为一级索引、随机选 n/4 个元素做为二级索引、随机选 n/8 个元素做为三级索引，依次类推，一直到最顶层索引。</font>这里每层索引的元素个数已经确定，且每层索引元素选取的足够随机，所以可以通过索引来提升跳表的查找效率。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjkmh0igfxj30vq0digme.jpg" alt></p>
+<p>那代码该如何实现，才能使跳表满足上述这个样子呢？可以在每次新插入元素的时候，尽量让该元素有 1/2 的几率建立一级索引、1/4 的几率建立二级索引、1/8 的几率建立三级索引，以此类推，就能满足我们上面的条件。现在我们就需要一个概率算法帮我们把控这个 1/2、1/4、1/8 … ，当每次有数据要插入时，先通过概率算法告诉我们这个元素需要插入到几级索引中，然后开始维护索引并把数据插入到原始链表中。下面开始讲解这个概率算法代码如何实现。</p>
+<p>我们可以实现一个 randomLevel 函数，该方法会随机生成 1~MAX_LEVEL 之间的数（MAX_LEVEL表示索引的最高层数），且该方法有 1/2 的概率返回 1、1/4 的概率返回 2、1/8的概率返回 3，以此类推。</p>
+<p>randomLevel 函数返回 1 表示当前插入的该元素不需要建索引，只需要存储数据到原始链表即可（概率 1/2）<br>randomLevel 函数返回 2 表示当前插入的该元素需要建一级索引（概率 1/4）<br>randomLevel 函数返回 3 表示当前插入的该元素需要建二级索引（概率 1/8）<br>randomLevel 函数返回 4 表示当前插入的该元素需要建三级索引（概率 1/16）<br>。。。以此类推<br>所以，通过 randomLevel 函数，我们可以控制整个跳表各级索引中元素的个数。重点来了：randomLevel 函数返回 2 的时候会建立一级索引，我们想要一级索引中元素个数占原始数据的 1/2，但是 randomLevel 函数返回 2 的概率为 1/4，那是不是有矛盾呢？明明说好的 1/2，结果一级索引元素个数怎么变成了原始链表的 1/4？我们先看下图，应该就明白了。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjkmj496paj30vq0nggmz.jpg" alt></p>
+<p>假设我们在插入元素 6 的时候，randomLevel 函数返回 1，则我们不会为 6 建立索引。插入 7 的时候，randomLevel 函数返回3 ，所以我们需要为元素 7 建立二级索引。这里我们发现了一个特点：当建立二级索引的时候，同时也会建立一级索引；当建立三级索引时，同时也会建立一级、二级索引。所以，一级索引中元素的个数等于 [ 原始链表元素个数 ] * [ randomLevel 函数返回值 &gt; 1 的概率 ]。因为 randomLevel 函数返回值 &gt; 1就会建索引，凡是建索引，无论几级索引必然有一级索引，所以一级索引中元素个数占原始数据个数的比率为 randomLevel 函数返回值 &gt; 1 的概率。那 randomLevel 函数返回值 &gt; 1 的概率是多少呢？因为 randomLevel 函数随机生成 1~MAX_LEVEL 的数字，且 randomLevel 函数返回值 1 的概率为 1/2，则 randomLevel 函数返回值 &gt; 1 的概率为 1 - 1/2 = 1/2。即通过上述流程实现了一级索引中元素个数占原始数据个数的 1/2。</p>
+<p>同理，当 randomLevel 函数返回值 &gt; 2 时，会建立二级或二级以上索引，都会在二级索引中增加元素，因此二级索引中元素个数占原始数据的比率为 randomLevel 函数返回值 &gt; 2 的概率。 randomLevel 函数返回值 &gt; 2 的概率为 1 减去 randomLevel = 1 或 =2 的概率，即 1 - 1/2 - 1/4 = 1/4。OK，达到了我们设计的目标：二级索引中元素个数占原始数据的 1/4。</p>
+<p>以此类推，可以得出，遵守以下两个条件：</p>
+<p>randomLevel 函数，随机生成 1~MAX_LEVEL 之间的数（MAX_LEVEL表示索引的最高层数），且有 1/2的概率返回 1、1/4的概率返回 2、1/8的概率返回 3 …<br>randomLevel 函数返回 1 不建索引、返回2建一级索引、返回 3 建二级索引、返回 4 建三级索引 …<br>就可以满足我们想要的结果，即：一级索引中元素个数应该占原始数据的 1/2，二级索引中元素个数占原始数据的 1/4，三级索引中元素个数占原始数据的 1/8 ，依次类推，一直到最顶层索引。</p>
+<p>但是问题又来了，怎么设计这么一个 randomLevel 函数呢？直接撸代码：</p>
+<pre class=" language-java"><code class="language-java">  <span class="token comment" spellcheck="true">// 该 randomLevel 方法会随机生成 1~MAX_LEVEL 之间的数，且 ：</span>
+  <span class="token comment" spellcheck="true">//        1/2 的概率返回 1</span>
+  <span class="token comment" spellcheck="true">//        1/4 的概率返回 2</span>
+  <span class="token comment" spellcheck="true">//        1/8 的概率返回 3 以此类推</span>
+  <span class="token keyword">private</span> <span class="token keyword">int</span> <span class="token function">randomLevel</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> level <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 当 level &lt; MAX_LEVEL，且随机数小于设定的晋升概率时，level   1</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>Math<span class="token punctuation">.</span><span class="token function">random</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> SKIPLIST_P <span class="token operator">&amp;&amp;</span> level <span class="token operator">&lt;</span> MAX_LEVEL<span class="token punctuation">)</span>
+      level <span class="token operator">+=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> level<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span></code></pre>
+<p>上述代码可以实现我们的功能，而且，我们的案例中晋升概率 SKIPLIST_P 设置的 1/2，即：每两个结点抽出一个结点作为上一级索引的结点。如果我们想节省空间利用率，可以适当的降低代码中的 SKIPLIST_P，从而减少索引元素个数，Redis 的 zset 中 SKIPLIST_P 设定的 0.25。下图所示，是Redis t_zset.c 中 zslRandomLevel 函数的实现：<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjkmo3cp8wj30uy0b6418.jpg" alt></p>
+<p>Redis 源码中 ((random(())&amp;0xFFFF)) &lt; ((ZSKIPLIST_P * 0xFFFF)) 在功能上等价于我代码中的 Math.random(()) &lt; SKIPLIST_P ，只不过 Redis 作者 antirez 使用位运算来提高浮点数比较的效率。</p>
+<p>整体思路大家应该明白了，那插入数据时维护索引的时间复杂度是多少呢？元素插入到单链表的时间复杂度为 O(1)，我们索引的高度最多为 logn，当插入一个元素 x 时，最坏的情况就是元素 x 需要插入到每层索引中，所以插入数据到各层索引中，最坏时间复杂度是 O(logn)。</p>
+<p>过程大概理解了，再通过一个例子描述一下跳表插入数据的全流程。现在我们要插入数据 6 到跳表中，首先 randomLevel() 返回 3，表示需要建二级索引，即：一级索引和二级索引需要增加元素 6。该跳表目前最高三级索引，首先找到三级索引的 1，发现 6 比 1大比 13小，所以，从 1 下沉到二级索引。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjkmru1ejzj30vq0ngabn.jpg" alt></p>
+<p>下沉到二级索引后，发现 6 比 1 大比 7 小，此时需要在二级索引中 1 和 7 之间加一个元素6 ，并从元素 1 继续下沉到一级索引。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjkmt4mak1j30vq0ngtaf.jpg" alt></p>
+<p>下沉到一级索引后，发现 6 比 1 大比 4 大，所以往后查找，发现 6 比 4 大比 7 小，此时需要在一级索引中 4 和 7 之间加一个元素 6 ，并把二级索引的 6 指向 一级索引的 6，最后，从元素 4 继续下沉到原始链表。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjkmtry5apj30vq0ngq4t.jpg" alt></p>
+<p>下沉到原始链表后，就比较简单了，发现 4、5 比 6小，7比6大，所以将6插入到 5 和 7 之间即可，整个插入过程结束。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjkmu5o09uj30vq0ngtao.jpg" alt></p>
+<p>整个插入过程的路径与查找元素路径类似， 每层索引中插入元素的时间复杂度 O((1))，所以整个插入的时间复杂度是 O((logn))。</p>
+<h3 id="删除数据"><a href="#删除数据" class="headerlink" title="删除数据"></a>删除数据</h3><p><font style="font-weight: 900;"> 时间复杂度为 O((logn))</font><br>跳表删除数据时，要把索引中对应节点也要删掉。如下图所示，如果要删除元素 9，需要把原始链表中的 9 和第一级索引的 9 都删除掉。<br><img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gjkncupyqbj30vq0if75j.jpg" alt></p>
+<p>跳表中，删除元素的时间复杂度是多少呢？</p>
+<p>删除元素的过程跟查找元素的过程类似，只不过在查找的路径上如果发现了要删除的元素 x，则执行删除操作。跳表中，每一层索引其实都是一个有序的单链表，单链表删除元素的时间复杂度为 O((1))，索引层数为 logn 表示最多需要删除 logn 个元素，所以删除元素的总时间包含 查找元素的时间 加 删除 logn个元素的时间 为 O((logn)) + O((logn)) = 2 O((logn))，忽略常数部分，删除元素的时间复杂度为 O((logn))</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<li>跳表是可以实现二分查找的有序链表；</li>
+<li>每个元素插入时随机生成它的level；</li>
+<li>最底层包含所有的元素；</li>
+<li>如果一个元素出现在level((x))，那么它肯定出现在x以下的level中；</li>
+<li>每个索引节点包含两个指针，一个向下，一个向右；（笔者目前看过的各种跳表源码实现包括Redis 的zset 都没有向下的指针，那怎么从二级索引跳到一级索引呢？留个悬念，看源码吧，文末有跳表实现源码）</li>
+<li>跳表查询、插入、删除的时间复杂度为O((log n))，与平衡二叉树接近；</li>
+</ol>
+<h2 id="为什么Redis选择使用跳表而不是红黑树来实现有序集合？"><a href="#为什么Redis选择使用跳表而不是红黑树来实现有序集合？" class="headerlink" title="为什么Redis选择使用跳表而不是红黑树来实现有序集合？"></a>为什么Redis选择使用跳表而不是红黑树来实现有序集合？</h2><ol>
+<li>skiplist的复杂度和红黑树一样，而且实现起来更简单。</li>
+<li>在并发环境下skiplist有另外一个优势，红黑树在插入和删除的时候可能需要做一些rebalance的操作，这样的操作可能会涉及到整个树的其他部分，而skiplist的操作显然更加局部一些，所需要顶住的节点更少，因此在这种的情况下性能好一些。</li>
+<li>按照范围区间查找元素（比如查找值在 [100, 356] 之间的数据）, 红黑树的效率没有跳表高。跳表可以做到 O((logn)) 的时间复杂度定位区间的起点，然后在原始链表中顺序往后遍历就可以了，非常高效。</li>
+</ol>
+<p><a href="https://github.com/redis/redis/blob/unstable/src/t_zset.c" target="_blank" rel="noopener">redis zet源码</a></p>
+
+            </div>
+            <hr />
+
+            
+            <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.88rem;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-large waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fa fa-close"></i></a>
+            <h4 class="reward-title">写作不易，打赏一杯奶茶？</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+
+            <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    <div class="social-share" data-disabled="qzone" data-wechat-qrcode-helper="<p>微信里点“发现”->“扫一扫”二维码便可查看分享。</p>"></div>
+    
+</div>
+
+<script src="/libs/share/js/social-share.min.js"></script>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        <p class="reprint-tip">
+            <i class="fa fa-exclamation-triangle"></i>&nbsp;&nbsp;
+            <span>转载规则</span>
+        </p>
+        
+            <div class="center-align">
+                <a rel="license" href="https://creativecommons.org/licenses/by/4.0/deed.zh">
+                    <img alt=""
+                         style="border-width:0"
+                         src="https://i.creativecommons.org/l/by/4.0/88x31.png"/>
+                </a>
+            </div>
+            <br/>
+            <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text"
+                  property="dct:title" rel="dct:type">
+                    《1. 数组、链表与跳表》
+                </span> 由
+            <a xmlns:cc="http://creativecommons.org/ns#" href="" property="cc:attributionName"
+               rel="cc:attributionURL">
+                杨帅
+            </a> 采用
+            <a rel="license" href="https://creativecommons.org/licenses/by/4.0/deed.zh">
+                知识共享署名 4.0 国际许可协议
+            </a>进行许可。
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="../shi-jian-fu-za-du-he-kong-jian-fu-za-du/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/2.jpg" class="responsive-img" alt="时间复杂度和空间复杂度">
+                        
+                        <span class="card-title">时间复杂度和空间复杂度</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            算法
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2020-10-04
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="../../../../categories/算法/" class="post-category" target="_blank">
+                                    算法
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="../../../../tags/算法/" target="_blank">
+                        <span class="chip bg-color">算法</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="../../../02/20/xiao-cheng-xu-ji-chu-jia-gou-shen-ru-jie-xi/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="小程序基础架构深入解析">
+                        
+                        <span class="card-title">小程序基础架构深入解析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            小程序架构
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2020-02-20
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="../../../../categories/小程序架构/" class="post-category" target="_blank">
+                                    小程序架构
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="../../../../tags/小程序架构/" target="_blank">
+                        <span class="chip bg-color">小程序架构</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+</div>
+
+
+<script>
+    $('#articleContent').on('copy', function (e) {
+        // IE8 or earlier browser is 'undefined'
+        if (typeof window.getSelection === 'undefined') return;
+
+        var selection = window.getSelection();
+        // if the selection is short let's not annoy our users.
+        if (('' + selection).length < Number.parseInt('120')) {
+            return;
+        }
+
+        // create a div outside of the visible area and fill it with the selected text.
+        var bodyElement = document.getElementsByTagName('body')[0];
+        var newdiv = document.createElement('div');
+        newdiv.style.position = 'absolute';
+        newdiv.style.left = '-99999px';
+        bodyElement.appendChild(newdiv);
+        newdiv.appendChild(selection.getRangeAt(0).cloneContents());
+
+        // we need a <pre> tag workaround.
+        // otherwise the text inside "pre" loses all the line breaks!
+        if (selection.getRangeAt(0).commonAncestorContainer.nodeName === 'PRE') {
+            newdiv.innerHTML = "<pre>" + newdiv.innerHTML + "</pre>";
+        }
+
+        var url = document.location.href;
+        newdiv.innerHTML += '<br />'
+            + '来源: 杨帅的博客<br />'
+            + '作者: 杨帅<br />'
+            + '链接: <a href="' + url + '">' + url + '</a><br />'
+            + '本文章著作权归作者所有，任何形式的转载都请注明出处。';
+
+        selection.selectAllChildren(newdiv);
+        window.setTimeout(function () { bodyElement.removeChild(newdiv); }, 200);
+    });
+</script>
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="fa fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fa fa-list"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            // headingsOffset: -205,
+            headingSelector: 'h1, h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h1, h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).slideUp(500);
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).slideDown(500);
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+    
+
+</main>
+
+
+<script src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+    MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['$', '$'], ['\(', '\)']]}
+    });
+</script>
+
+<footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            &copy; 2019AmosYang. All Rights Reserved.
+
+            
+            &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
+            <span class="white-color">64.6k</span>
+            
+
+            <br>
+            <span id="sitetime"></span>
+
+            
+            
+            <br>
+            
+            <span id="busuanzi_container_site_pv" style='display:none'>
+                <i class="fa fa-heart-o"></i>
+                本站总访问量 <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv" style='display:none'>
+                人次,&nbsp;访客数 <span id="busuanzi_value_site_uv" class="white-color"></span> 人.
+            </span>
+            
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/XiaoY0324" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fa fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:15910830710@163.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fa fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+    <a href="https://user.qzone.qq.com/363713182" class="tooltipped" target="_blank" data-tooltip="访问我的QQ空间" data-position="top" data-delay="50">
+        <i class="fa fa-qq"></i>
+    </a>
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+<!-- 不蒜子计数初始值纠正 -->
+<script>
+    $(document).ready(function () {
+
+        var int = setInterval(fixCount, 50);
+        var pvcountOffset = 80000;
+        var uvcountOffset = 20000;
+
+        function fixCount() {
+            if (document.getElementById("busuanzi_container_site_pv").style.display != "none") {
+                $("#busuanzi_value_site_pv").html(parseInt($("#busuanzi_value_site_pv").html()) + pvcountOffset);
+                clearInterval(int);
+            }
+            if ($("#busuanzi_container_site_pv").css("display") != "none") {
+                $("#busuanzi_value_site_uv").html(parseInt($("#busuanzi_value_site_uv").html()) + uvcountOffset); // 加上初始数据 
+                clearInterval(int);
+            }
+        }
+    });
+</script>
+
+<script language=javascript>
+    function siteTime() {
+        window.setTimeout("siteTime()", 1000);
+        var seconds = 1000;
+        var minutes = seconds * 60;
+        var hours = minutes * 60;
+        var days = hours * 24;
+        var years = days * 365;
+        var today = new Date();
+        var todayYear = today.getFullYear();
+        var todayMonth = today.getMonth() + 1;
+        var todayDate = today.getDate();
+        var todayHour = today.getHours();
+        var todayMinute = today.getMinutes();
+        var todaySecond = today.getSeconds();
+        /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+        year - 作为date对象的年份，为4位年份值
+        month - 0-11之间的整数，做为date对象的月份
+        day - 1-31之间的整数，做为date对象的天数
+        hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+        minutes - 0-59之间的整数，做为date对象的分钟数
+        seconds - 0-59之间的整数，做为date对象的秒数
+        microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+        var t1 = Date.UTC(2017, 09, 11, 00, 00, 00); //北京时间2018-2-13 00:00:00
+        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+        var diff = t2 - t1;
+        var diffYears = Math.floor(diff / years);
+        var diffDays = Math.floor((diff / days) - diffYears * 365);
+        var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+        var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) / minutes);
+        var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours - diffMinutes * minutes) / seconds);
+        document.getElementById("sitetime").innerHTML = "本站已运行 " + diffYears + " 年 " + diffDays + " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+    }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+    siteTime();
+</script>
+
+<!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+<!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fa fa-angle-up"></i>
+    </a>
+</div>
+
+
+<script src="/libs/materialize/materialize.min.js"></script>
+<script src="/libs/masonry/masonry.pkgd.min.js"></script>
+<script src="/libs/aos/aos.js"></script>
+<script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+<script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+<script src="/js/matery.js"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', '');
+</script>
+
+
+
+    <script src="/libs/others/clicklove.js"></script>
+
+
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
