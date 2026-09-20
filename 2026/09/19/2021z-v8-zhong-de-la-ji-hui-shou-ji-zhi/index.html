@@ -1,0 +1,1106 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="V8中的垃圾回收机制, 杨帅 amosyang shuaiYang 前端">
+    <meta name="baidu-site-verification" content>
+    <meta name="google-site-verification" content>
+    <meta name="description" content="JavaScript中的垃圾收集
+程序的运行需要内存,只要程序要求，操作系统就必须提供内存
+JavaScript使用自动内存管理，这被称为”垃圾回收机制”（garbage collector）
+优点是可以简化开发、节省代码，缺点是无法完整的">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>V8中的垃圾回收机制 | amosyang</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    <style type="text/css">
+        
+    </style>
+
+    <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
+    <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?46e79e71af0709a5b9106bf20cecc493";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body>
+
+<header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="../../../../index.html" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">amosyang</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fa fa-navicon"></i></a>
+<ul class="right">
+    
+    <li class="hide-on-med-and-down">
+        <a href="/" class="waves-effect waves-light">
+            
+            <span>首页</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/tags" class="waves-effect waves-light">
+            
+            <span>标签</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/categories" class="waves-effect waves-light">
+            
+            <span>分类</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/archives" class="waves-effect waves-light">
+            
+            <span>归档</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/about" class="waves-effect waves-light">
+            
+            <span>关于</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/friends" class="waves-effect waves-light">
+            
+            <span>友情链接</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/contact" class="waves-effect waves-light">
+            
+            <span>联系我</span>
+        </a>
+    </li>
+    
+    <li>
+        <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+            <i id="searchIcon" class="fa fa-search" title="搜索"></i>
+        </a>
+    </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">amosyang</div>
+        <div class="logo-desc">
+            
+            计算机科学与技术
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li>
+            <a href="/" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                首页
+            </a>
+        </li>
+        
+        <li>
+            <a href="/tags" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                标签
+            </a>
+        </li>
+        
+        <li>
+            <a href="/categories" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                分类
+            </a>
+        </li>
+        
+        <li>
+            <a href="/archives" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                归档
+            </a>
+        </li>
+        
+        <li>
+            <a href="/about" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                关于
+            </a>
+        </li>
+        
+        <li>
+            <a href="/friends" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                友情链接
+            </a>
+        </li>
+        
+        <li>
+            <a href="/contact" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-link"></i>
+                
+                联系我
+            </a>
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/XiaoY0324" class="waves-effect waves-light" target="_blank">
+                <i class="fa fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/XiaoY0324" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '../../../../index.html';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/8.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        V8中的垃圾回收机制
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 20px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                        <a href="../../../../tags/V8-系列/" target="_blank">
+                            <span class="chip bg-color">V8 系列</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                        <a href="../../../../categories/V8-系列/" class="post-category" target="_blank">
+                            V8 系列
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                <div class="post-date info-break-policy">
+                    <i class="fa fa-calendar-minus-o fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2026-09-19
+                </div>
+
+                <div class="post-author info-break-policy">
+                    <i class="fa fa-user-o fa-fw"></i>作者:&nbsp;&nbsp;
+                    
+                    杨帅
+                    
+                </div>
+
+                
+                
+                <div class="info-break-policy">
+                    <i class="fa fa-file-word-o fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    2.2k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="fa fa-clock-o fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    8 分
+                </div>
+                
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="JavaScript中的垃圾收集"><a href="#JavaScript中的垃圾收集" class="headerlink" title="JavaScript中的垃圾收集"></a>JavaScript中的垃圾收集</h1><ul>
+<li>程序的运行需要内存,只要程序要求，操作系统就必须提供内存</li>
+<li>JavaScript使用自动内存管理，这被称为”垃圾回收机制”（garbage collector）</li>
+<li>优点是可以简化开发、节省代码，缺点是无法完整的掌握内存的分配与回收的具体过程</li>
+</ul>
+<h1 id="NodeJS中的内存管理"><a href="#NodeJS中的内存管理" class="headerlink" title="NodeJS中的内存管理"></a>NodeJS中的内存管理</h1><p><strong>如果不再用到的内存没有及时释放，就叫做内存泄漏。</strong></p>
+<ul>
+<li>浏览器端的内存泄漏(其实没有那么严重，用户直接是独立进程)</li>
+<li>对于持续运行的服务进程Node服务器端程序,必须及时释放不再用到的内存。否则，内存占用越来越高，轻则影响系统性能，重则导致进程崩溃。</li>
+</ul>
+<h1 id="V8内存管理"><a href="#V8内存管理" class="headerlink" title="V8内存管理"></a>V8内存管理</h1><p><strong>V8使用内存大小限制的，在64位操作系统最大可以使用1.4G，在32位操作系统中最大可以使用0.7G内存。</strong></p>
+<h2 id="查看node中的内存使用情况"><a href="#查看node中的内存使用情况" class="headerlink" title="查看node中的内存使用情况"></a>查看node中的内存使用情况</h2><ul>
+<li>JS对象都是通过V8进行分配管理内存的</li>
+<li>process.memoryUsage 返回一个对象，包含了 Node 进程的内存占用信息<pre class=" language-js"><code class="language-js"><span class="token comment" spellcheck="true">// node 环境下</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>process<span class="token punctuation">.</span><span class="token function">memoryUsage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// {</span>
+<span class="token comment" spellcheck="true">//   rss: 17637376,    => 1.7m  所有内存占用，包括指令区和堆栈</span>
+<span class="token comment" spellcheck="true">//   heapTotal: 4210688,  => 4.2m 堆占用的内存，包括用到的和没用到的</span>
+<span class="token comment" spellcheck="true">//   heapUsed: 2054992,   => 2m 用到的堆的部分。判断内存泄漏，以 heapUsed 字段为准</span>
+<span class="token comment" spellcheck="true">//   external: 651324     => 6k V8 引擎内部的 C++ 对象占用的内存</span>
+<span class="token comment" spellcheck="true">// }</span></code></pre>
+<image width="300" src="https://ys-cos-1303005044.cos.ap-beijing.myqcloud.com/static/dc0a290929998449324d7263d4b52ede.jpeg">
+<image width="700" src="https://ys-cos-1303005044.cos.ap-beijing.myqcloud.com/static/77fcf27e9026162b9154fbcfb4b78e94.jpeg">
+
+</image></image></li>
+</ul>
+<h2 id="V8为什么要限制内存大小"><a href="#V8为什么要限制内存大小" class="headerlink" title="V8为什么要限制内存大小"></a>V8为什么要限制内存大小</h2><ul>
+<li>因为V8的垃圾收集工作原理导致的, 1.4G内存完全一次垃圾收集需要1秒以上</li>
+<li>这个暂停时间成为 Stop The World ,在这个期间，应用的性能和响应能力都会下降(扫描过程中，做不成其他事情~)</li>
+</ul>
+<h2 id="如何突破内存限制"><a href="#如何突破内存限制" class="headerlink" title="如何突破内存限制"></a>如何突破内存限制</h2><p><strong>一旦初始化成功，生效后不能再修改</strong></p>
+<ul>
+<li>–max-new-space-size，最大 new space 大小，执行 scavenge 回收，默认 16M，单位 KB</li>
+<li>–max-old-space-size，最大 old space 大小，执行 MarkSweep 回收，默认 1G，单位 MB</li>
+</ul>
+<pre class=" language-js"><code class="language-js">node <span class="token operator">--</span>max<span class="token operator">-</span>old<span class="token operator">-</span>space<span class="token operator">-</span>size<span class="token operator">=</span><span class="token number">2000</span> app<span class="token punctuation">.</span>js 单位是M
+node <span class="token operator">--</span>max<span class="token operator">-</span><span class="token keyword">new</span><span class="token operator">-</span>space<span class="token operator">-</span>size<span class="token operator">=</span><span class="token number">1024</span> app<span class="token punctuation">.</span>js 单位是kb</code></pre>
+<h2 id="V8的垃圾回收机制♻️"><a href="#V8的垃圾回收机制♻️" class="headerlink" title="V8的垃圾回收机制♻️"></a>V8的垃圾回收机制♻️</h2><ul>
+<li>V8是基于分代的垃圾回收</li>
+<li>不同代垃圾回收机制也不一样</li>
+<li>按存活的时间分为新生代和老生代</li>
+</ul>
+<h3 id="V8分代概念"><a href="#V8分代概念" class="headerlink" title="V8分代概念"></a>V8分代概念</h3><p><img src="https://ys-cos-1303005044.cos.ap-beijing.myqcloud.com/static/fdc4b4b9bce931b6728d3627bdec2e30.jpeg" alt></p>
+<ul>
+<li>年龄小的是新生代，由From区域和To区域两个区域组成<ul>
+<li>在64位系统里，新生代内存是32M，From区域和To区域各占一半</li>
+<li>在32位系统里，新生代内存是16M，From区域和To区域各占一半</li>
+</ul>
+</li>
+<li>年龄大的是老生代,默认情况下，<ul>
+<li>64为系统下老生代内存是1400M</li>
+<li>32为系统下老生代内存是700M</li>
+</ul>
+</li>
+</ul>
+<h3 id="引用计数"><a href="#引用计数" class="headerlink" title="引用计数"></a>引用计数</h3><ul>
+<li>语言引擎有一张引用表，保存了内存里面所有的资源的引用次数(从GC ROOT查找)。</li>
+<li>如果一个值的引用次数是0，就表示这个值不再用到了，因此可以将这块内存释放。<image width="700" src="https://ys-cos-1303005044.cos.ap-beijing.myqcloud.com/static/76c7ea9cfd0d353b922a2e16792f0627.jpeg">
+此图中，F，D，E对象在扫描时，均应该被回收掉。为了确切的理解引用计数，我们来写一段代码：
+
+</image></li>
+</ul>
+<pre class=" language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script language-javascript">
+    <span class="token keyword">function</span> <span class="token function">Person</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">let</span> p1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token string">'ys1'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> p2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token string">'ys2'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// 3s 之后干掉 p1</span>
+    <span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> p1 <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token number">3000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 10s 之后干掉 p2</span>
+    <span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span><span class="token operator">></span> p2 <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token number">10000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span></code></pre>
+<p>打开控制台，我们分别间隔 1s，3s，10s 拍下三个快照。<br><img src="https://ys-cos-1303005044.cos.ap-beijing.myqcloud.com/static/5664a809fd44e9931bdbba0a63e86f71.jpeg" alt><br>可以看到，解除引用的实例的内存被回收了。</p>
+<p>再来看一个例子：</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">Person</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">let</span> p1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token string">'ys1'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> <span class="token keyword">set</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Set</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">set</span><span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>p1<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// set 堆中保存着 0 -> ys1 实例 的引用</span>
+p1 <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span></code></pre>
+<p>这种情况下，ys1 的实例所在的堆内存是不会被回收的，因为虽然 p1 不再引用了，但是 set 中依旧保持着对实例对象的引用。如果想让该实例对象被回收，直接 set = null 即可，这也会导致 set 所在的堆内存回收哦。</p>
+<h3 id="新生代的垃圾回收"><a href="#新生代的垃圾回收" class="headerlink" title="新生代的垃圾回收"></a>新生代的垃圾回收</h3><ul>
+<li>新生代区域一分为二，每个16M，一个使用，一个空闲</li>
+<li>开始垃圾回收的时候，会检查FROM区域中的存活对象，如果还活着，拷贝到TO空间，完成后释放空间</li>
+<li>完成后 <font style="background: #f9f2f4; color: #c7254e; padding: 3px 5px; border-radius: 5px;">FROM</font> 和 <font style="background: #f9f2f4; color: #c7254e; padding: 3px 5px; border-radius: 5px;">TO</font> 互换</li>
+<li>新生代扫描的时候是一种广度优先的扫描策略</li>
+<li>新生代的空间小，存活对象少</li>
+<li>当一个对象经历过多次的垃圾回收依然存活的时候，生存周期比较长的对象会被移动到老生代，这个移动过程被成为晋升或者升级<ul>
+<li><strong>经过5次以上的回收还存在</strong></li>
+<li><strong>TO的空间使用占比超过25%，或者超大对象</strong></li>
+</ul>
+</li>
+</ul>
+<p><img src="https://ys-cos-1303005044.cos.ap-beijing.myqcloud.com/static/46684a8e7d7939ccc00f0af013b24b8b.jpeg" alt></p>
+<p><font style="background: rgba(27,31,35,.05); color: #476582; padding: 2px 4px; margin: 0 2px; border-radius: 3px;">scanPointer(扫描指针)</font>、<font style="background: rgba(27,31,35,.05); color: #476582; padding: 2px 4px; margin: 0 2px; border-radius: 3px;">allocatePointer(分配指针)</font></p>
+<ol>
+<li>如图，首先回收前新生代的 from 区域存在 A、B、C 三个变量，某个时间点，V8 引擎开始扫描新生代 from 区域，发现存在根对象引用的 A「<strong>广度优先</strong>，如果还有其他直接引用的，也会拷贝到老生代」，将 A 拷贝到老生代，老生代中扫描指针指向 A(开始扫描 A 的引用)，然后分配指针往后移一位(接下来复制过来的对象要放在这个内存地址)。</li>
+<li>扫描 A 的引用对象，发现 A 引用了 B，将 B 拷贝到老生代，分配指针继续后移。</li>
+<li>继续扫描 A，发现没有其他引用了，扫描指针后移，开始扫描 B。</li>
+<li>B 也没其他引用了，扫描指针继续后移，此时扫描指针与分配指针重合，新生代扫描结束，释放 from 所有内存，并将 to 作为下一个新生代，from 则转变为老生代。</li>
+</ol>
+<p>那什么时候使用到老生代呢，毕竟新生代那么小，老生代可大着呢，有两种情况会把变量丢给老生代处理：</p>
+<ul>
+<li>如果一个对象存活了五轮的新生代垃圾回收，那么它有资格放到老生代。</li>
+<li>如果新生代中 to 的空间使用超过 25%，或者直接丢给个放不下的对象，这时候会把变量放到老生代。</li>
+</ul>
+<h3 id="老生代的垃圾回收"><a href="#老生代的垃圾回收" class="headerlink" title="老生代的垃圾回收"></a>老生代的垃圾回收</h3><ul>
+<li><strong>两种策略，mark-sweep(标记清除，比较快，但是会形成内存碎片)，mark-compact(标记整理，略慢，内存连续)</strong></li>
+<li><strong>老生代空间大，大部分都是活着的对象，GC 耗时比较长，而且在此期间无法响应，STOP-THE-WORLD(全停顿)，V8 有一个优化方案，增量处理，把一个大暂停换成多个小暂停，INCREMENT-GC(增量标记)。</strong><image width="500" src="https://ys-cos-1303005044.cos.ap-beijing.myqcloud.com/static/9f0b410f225c32ca98e2263e0a823e56.jpeg"></image></li>
+<li><strong>mark-sweep(标记清除)</strong><ul>
+<li>标记活着的对象，随后清除在标记阶段没有标记的对象，只清理死亡对象</li>
+<li>问题在于清除后会出现内存不连续的情况，这种内存碎片会对后续的内存分配产生影响</li>
+<li>如果要分配一个大对象，碎片空间无法分配 (比如 window 电脑，有一个功能是可以对磁盘碎片整理)  </li>
+</ul>
+</li>
+<li><strong>mark-compact(标记整理)</strong><ul>
+<li>标记死亡后会对对象进行整理，活着的对象向左移动，移动完成后直接清理掉边界外的内存(haha，特别像我写的移动0)</li>
+</ul>
+</li>
+</ul>
+<p>两种垃圾回收的策略都会使用，只是 mark-sweep(标记清除) 使用的较多，因为它很快，偶尔使用 mark-compact(标记整理)，去整理内存空间，我猜是 10 比 1，你也可以猜一下。</p>
+<p><strong>因为老生代比较大，一次 GC 可能需要 1s 多，这对服务端是无法接受的，所以 V8 采用了一个 INCREMENT-GC(增量标记) 的优化策略~</strong></p>
+<ul>
+<li>以上三种回收时都需要暂停程序执行，收集完成后才能恢复， STOP-THE-WORLD(全停顿) 在新生代影响不大，但是老生代影响就非常大了，增量标记就是把标记改为了增量标记，把一口气的停顿拆分成了多个小步骤，做完一步程序运行一会儿，垃圾回收和应用程序运行交替进行，停顿时间可以减少到1/6左右。</li>
+</ul>
+<h3 id="新老生代三种-GC-回收算法对比"><a href="#新老生代三种-GC-回收算法对比" class="headerlink" title="新老生代三种 GC 回收算法对比"></a>新老生代三种 GC 回收算法对比</h3><p><img src="https://ys-cos-1303005044.cos.ap-beijing.myqcloud.com/static/8d166c5bab0772694dcde7d9cb7f9d23.jpeg" alt></p>
+<h1 id="题外话，快照查看闭包"><a href="#题外话，快照查看闭包" class="headerlink" title="题外话，快照查看闭包"></a>题外话，快照查看闭包</h1><pre class=" language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">Person</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">let</span> PersonFactory <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">let</span> p <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">let</span> p1 <span class="token operator">=</span> <span class="token function">PersonFactory</span><span class="token punctuation">(</span><span class="token string">'ys1'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p><img src="https://ys-cos-1303005044.cos.ap-beijing.myqcloud.com/static/8cde76bc99a5668247c44c5fd988186f.jpeg" alt><br>这样也可以观察到闭包行为哦，注意，上述代码，因为 p1 引用了匿名函数，匿名函数引用了 ys1 实例，才导致实例没有被销毁。所以，我们使 p1 = null 可以释放掉匿名函数和 ys1 实例的堆内存哦。</p>
+
+            </div>
+            <hr />
+
+            
+            <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.88rem;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-large waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fa fa-close"></i></a>
+            <h4 class="reward-title">写作不易，打赏一杯奶茶？</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+            
+
+            <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    <div class="social-share" data-disabled="qzone" data-wechat-qrcode-helper="<p>微信里点“发现”->“扫一扫”二维码便可查看分享。</p>"></div>
+    
+</div>
+
+<script src="/libs/share/js/social-share.min.js"></script>
+
+            
+
+
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="../2021z-buffer-de-shi-yong/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="buffer 常用 api 总结">
+                        
+                        <span class="card-title">buffer 常用 api 总结</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            node
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2026-09-19
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="../../../../categories/node/" class="post-category" target="_blank">
+                                    node
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="../../../../tags/node/" target="_blank">
+                        <span class="chip bg-color">node</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="../2021z-async-he-await-de-chu-li-ji-zhi/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="async和await的处理机制">
+                        
+                        <span class="card-title">async和await的处理机制</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            异步编程
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2026-09-19
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="../../../../categories/异步编程/" class="post-category" target="_blank">
+                                    异步编程
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="../../../../tags/异步编程/" target="_blank">
+                        <span class="chip bg-color">异步编程</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+</div>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="fa fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fa fa-list"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            // headingsOffset: -205,
+            headingSelector: 'h1, h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h1, h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).slideUp(500);
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).slideDown(500);
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+    
+
+</main>
+
+
+<footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            &copy; 2019AmosYang. All Rights Reserved.
+
+            
+            &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
+            <span class="white-color">299.8k</span>
+            
+
+            <br>
+            <span id="sitetime"></span>
+
+            
+            
+        </div>
+        <div class="col s12 m4 l4 social-link ">
+    <a href="https://github.com/XiaoY0324" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fa fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:15910830710@163.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fa fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+    <a href="https://user.qzone.qq.com/363713182" class="tooltipped" target="_blank" data-tooltip="访问我的QQ空间" data-position="top" data-delay="50">
+        <i class="fa fa-qq"></i>
+    </a>
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+<script language=javascript>
+    function siteTime() {
+        window.setTimeout("siteTime()", 1000);
+        var seconds = 1000;
+        var minutes = seconds * 60;
+        var hours = minutes * 60;
+        var days = hours * 24;
+        var years = days * 365;
+        var today = new Date();
+        var todayYear = today.getFullYear();
+        var todayMonth = today.getMonth() + 1;
+        var todayDate = today.getDate();
+        var todayHour = today.getHours();
+        var todayMinute = today.getMinutes();
+        var todaySecond = today.getSeconds();
+        /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+        year - 作为date对象的年份，为4位年份值
+        month - 0-11之间的整数，做为date对象的月份
+        day - 1-31之间的整数，做为date对象的天数
+        hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+        minutes - 0-59之间的整数，做为date对象的分钟数
+        seconds - 0-59之间的整数，做为date对象的秒数
+        microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+        var t1 = Date.UTC(2017, 09, 11, 00, 00, 00); //北京时间2018-2-13 00:00:00
+        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+        var diff = t2 - t1;
+        var diffYears = Math.floor(diff / years);
+        var diffDays = Math.floor((diff / days) - diffYears * 365);
+        var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+        var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) / minutes);
+        var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours - diffMinutes * minutes) / seconds);
+        document.getElementById("sitetime").innerHTML = "本站已运行 " + diffYears + " 年 " + diffDays + " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+    }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+    siteTime();
+</script>
+
+<!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+<!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fa fa-angle-up"></i>
+    </a>
+</div>
+
+
+<script src="/libs/materialize/materialize.min.js"></script>
+<script src="/libs/masonry/masonry.pkgd.min.js"></script>
+<script src="/libs/aos/aos.js"></script>
+<script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+<script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+<script src="/js/matery.js"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', '');
+</script>
+
+
+
+    <script src="/libs/others/clicklove.js"></script>
+
+
+
+</body>
+</html>

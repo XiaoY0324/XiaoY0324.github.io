@@ -1,0 +1,80 @@
+/* Here is your custom css styles. */
+.content .row  #toc-aside .toc-widget {
+  overflow-y: auto;
+  /* // height: calc(100vh - 180px); */
+}
+
+.pink {
+  background: #f9f2f4; 
+  color: #c7254e;
+  padding: 3px 5px; 
+  border-radius: 5px;
+  color: #fff;
+}
+
+/* 重写 diff 代码块样式 */
+.language-diff {
+  background-color: #f6f8fa !important;
+  color: #24292e !important;
+}
+
+.token.deleted {
+  color: #b31d28;
+  background: #ffeef0;
+}
+
+.token.inserted {
+  color: #22863a;
+  background: rgb(240 255 241);
+}
+
+summary::marker {
+  content: "🍓";
+}
+
+/* 粉红色背景红色文字 */
+.hs {
+  background: #f9f2f4; 
+  color: #c7254e; 
+  padding: 3px 5px; 
+  border-radius: 5px;
+}
+
+/* 浅蓝色背景，蓝色字体 */
+.ls {
+  background: rgba(27,31,35,.05); 
+  color: #1e6bb8; 
+  padding: 2px 4px; 
+  margin: 0 2px; 
+  border-radius: 4px;
+}
+
+/* 紫色背景，紫色文字 */
+.zs {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  word-wrap: break-word;
+  line-height: 1.4em;
+  list-style: initial;
+  box-sizing: border-box;
+  border: 0;
+  outline: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+  padding: 0;
+  padding-bottom: 2px;
+  margin: 0 3px;
+  vertical-align: top;
+  background-color: #ededf7;
+  border-radius: 4px;
+  padding-left: 3px;
+  padding-right: 3px;
+  font-size: 14px;
+  color: #6f5990;
+  vertical-align: middle;
+}
+
+.align-left .img-item {
+  text-align: left !important;
+}
