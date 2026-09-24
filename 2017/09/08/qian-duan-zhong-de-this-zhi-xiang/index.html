@@ -642,27 +642,6 @@
 
 <h1 id="自执行函数的this指向"><a href="#自执行函数的this指向" class="headerlink" title="自执行函数的this指向"></a>自执行函数的this指向</h1><pre class=" language-js"><code class="language-js">   obj <span class="token operator">=</span> <span class="token punctuation">{</span>
         fn<span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span>
-        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token punctuation">}</span>
-
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span>fn<span class="token punctuation">)</span></code></pre>
-<details>
-<summary> 答案</summary>
-<br>
-
-<blockquote>
-<ol>
-<li>windows对象<br></li>
-<li>undefined<br><br>注解: 非严格模式下, 自执行函数的this永远指向window</li>
-</ol>
-</blockquote>
-</details>
-
-<br>
-
-<h1 id="自执行函数的this指向-1"><a href="#自执行函数的this指向-1" class="headerlink" title="自执行函数的this指向"></a>自执行函数的this指向</h1><pre class=" language-js"><code class="language-js">   obj <span class="token operator">=</span> <span class="token punctuation">{</span>
-        fn<span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
             <span class="token comment" spellcheck="true">// "use strict";</span>
             console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -675,8 +654,8 @@
 
 <blockquote>
 <ol>
-<li>windows对象<br></li>
-<li>undefined<br><br>注解: 非严格模式下, 自执行函数的this永远指向window。打开注释试一下~</li>
+<li>window 对象<br></li>
+<li>undefined<br><br>注解：本例在浏览器经典脚本中运行。注释掉 “use strict” 时，立即执行的普通函数里的 this 是 window，所以函数内部先打印 window；函数没有 return，obj.fn 因而是 undefined，外部再打印 undefined。取消注释后，该函数内部的 this 为 undefined。</li>
 </ol>
 </blockquote>
 </details>
@@ -1467,7 +1446,7 @@
 
             
             &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
-            <span class="white-color">299.8k</span>
+            <span class="white-color">298.1k</span>
             
 
             <br>
